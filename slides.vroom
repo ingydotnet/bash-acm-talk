@@ -39,8 +39,11 @@ vimrc: |
 
 ---- center
 Programming in Bash
+(and other Random Hacks of Kindness)
 
 by Ingy döt Net
+
+ACM Kansas City
 
 November, 2020
 
@@ -74,8 +77,6 @@ that is not limited to a particular language are known as Acmeists.
 * Jemplate
 * Lingy
 * MakePlus
-Remind me to show these if we have time!
-
 
 ----
 == Bash Creations
@@ -173,6 +174,9 @@ main 123 456
   * Scripting Language == Programming Language
 
 * Therefore... Bash is a Programming Language (QED)
+
++* Learning Bash in depth #1 productivity boost
+* Bash is as capable as say, Python, for many tasks
 
 ----
 == Pieces of a Programming Language
@@ -293,18 +297,19 @@ for i in [1..10]
 == The git-hub command
 
 $ git hub user admorgan
+$ git hub followers admorgan
 $ git hub repos admorgan
 $ git hub repos admorgan --raw
 $ git hub repos admorgan --raw | tail -n3
 $ git hub repos admorgan --raw | tail -n3 | git hub clone -
-$ git hub repos admorgan --raw | tail -n3 | ( while read r; do ( set -x; rm -fr "${r#*/}" ); done )
 $ git hub user
 $ git hub repos
+$ (cd libfuse; git hub user; git hub repos)
+$ git hub repos admorgan --raw | tail -n3 | ( while read r; do ( set -x; rm -fr "${r#*/}" ); done )
 $ git hub repo git-hub
 $ git hub issues git-hub
 $ git hub issues git-hub -r | github issue -
 $ git hub repo
-$ git hub following | grep admorgan
 $ git hub follow admorgan
 
 ----
@@ -878,26 +883,29 @@ echo "$string"
 
 $ (cd git-hub; git subrepo status)
 
-$ (cd git-subrepo; bash -i)
-$ (cd git-hub; bash -i)
-$ (cd bashplus; bash -i)
-$ (cd getopt-bash; bash -i)
-$ (cd json-bash; bash -i)
-$ (cd test-more-bash; bash -i)
+$ (cd git-subrepo; bash)
+$ (cd git-hub; bash)
+$ (cd bashplus; bash)
+$ (cd getopt-bash; bash)
+$ (cd json-bash; bash)
+$ (cd test-more-bash; bash)
+$ (cd complete-shell; bash)
 
 ----
 == Other Cool Projects
 
 $ make -C testml test
-$ (cd testml; bash -i)
+$ (cd testml; bash)
   * Lingy
 
-$ (cd pegex-pm; bash -i)
+$ (cd pegex-pm; bash)
 
 $ make -C yaml-reference-parser test
-$ (cd yaml-reference-parser; bash -i)
+$ echo -e "foo:\n- bar\n- [x, y]: z' | yaml-reference-parser/perl/bin/yaml-parser
+$ echo -e "foo:\n- bar\n- [x, y]: z' | TRACE=1 yaml-reference-parser/perl/bin/yaml-parser
+$ (cd yaml-reference-parser; bash)
 
-$ yaml-editor -i
+$ yaml-editor -l
 $ yaml-editor -g 1 4 15 20 28
 
 ----
