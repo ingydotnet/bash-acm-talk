@@ -1,0 +1,919 @@
+---- config
+# Basic config options.
+title: Real Programming in Bash
+indent: 4
+auto_size: 1
+vim_opts: '-u NONE'
+skip: 0
+vimrc: |
+  " Redo some vroom defaults:
+  unmap AA
+  unmap OO
+  unmap RR
+  unmap EE
+  map <SPACE> :wa!<cr>:n<CR>:<CR>gg
+  map <BACKSPACE> :wa!<cr>:N<CR>:<CR>gg
+
+  " Not sure this is working:
+  source ~/.vimrc
+
+  " For slide editing:
+  set nohlsearch
+  set filetype=xxx
+  set shiftwidth=2
+  set softtabstop=2
+  set smartindent
+  set smarttab
+
+  " Slide movement helpers:
+  map q ;
+  map qq :q!<cr>
+  map t gg0
+  map j }+
+  map k {{+
+
+  " Slide code runners
+  map <enter>     :wa!<cr>:exec '!./run ' . @% . ' ' . line(".")<cr>
+  map \\<enter>   :wa!<cr>:exec '!./run ' . @% . ' ' . line(".") . ' --errexit'<cr>
+  map \\\\<enter> :wa!<cr>:exec '!./run ' . @% . ' ' . line(".") . ' --errexit,--xtrace'<cr>
+
+---- center
+Programming in Bash
+
+by Ingy döt Net
+
+November, 2020
+
+----
+== Ingy döt Net
+
+* Inventor and maintainer of the YAML language
+* Speaker at Open Source conferences and meetups worldwide
+* Author of over 200 CPAN packages
+  * https://stats.cpantesters.org/leadercpan.html
+
+$ curl -s https://www.cpan.org/modules/02packages.details.txt | grep '/INGY/'
+
+* Published modules to PyPI, NPM, Gems, BPAN
+* 600+ GitHub repos
+
+$ git hub repos ingydotnet  # git-hub is a tool I wrote in Bash!
+
+----
+== Acmeist Creations
+
+http://acmeism.org/
+
+Acmeism is the belief that language naturally tends to divide people and ideas,
+but that technology can overcome this tendency. People who create technology
+that is not limited to a particular language are known as Acmeists.
+
+* Inline
+* Pegex
+* TestML
+* Jemplate
+* Lingy
+* MakePlus
+Remind me to show these if we have time!
+
+
+----
+== Bash Creations
+
+* git-hub
+* git-subrepo
+* bashplus
+* test-more-bash
+* json-bash
+* getopt-bash
+* config-ini-bash
+* complete-shell
+* BPAN
+* TestML
+
+----
+== Vroom
+
+* SlideShows in Vim
++* On CPAN:
+  * https://metacpan.org/release/Vroom
++* All my presentations since 2008
++* Interactive
+
+$ vim slides.vroom . -O
+
+$ perldoc Vroom
+
+---- .bash
+
+## An Example Bash Program
+
+main() {
+  local x=$1 y=$2
+
+  add $x $y
+  sum=$?
+
+  echo "$x + $y = $sum"
+
+  if (( x + y != sum )); then
+    echo "^^ Whu?!?!"
+  fi
+}
+
+add() {
+  x=$1 y=$2
+  return $(( x + y ))
+}
+
+main 1 1
+main 2 4
+main 123 456
+
+----
+== What is a Shell?
+
+* Bash is a command line "shell"
+* A shell is the user interface to your computer
+* You can make your computer do *anything* with a shell
+* macOS and Windows are also "shells" (gui shells)
+* The "shell" is a wrapper around the OS kernel
+
+----
+== Interactive Shells
+
+* Every programmer has run commands in a terminal
+* A terminal (emulator) is a GUI program that runs:
+  * A default interactive shell
+  * Various curses programs
+* Common interactive shells:
+  * Bourne Shell  sh    Stephen Bourne (Bell Labs 70s)
+  * KornShell     ksh   David Korn
+  * Bash          bash  Bourne Again SHell
+  * Zsh           zsh   Bash compatible
+  * Ash           ash   Almquist Shell
+  * Fish          fish  Friendly Interactive SHell
+* bash, zsh and fish are most common for personal machines
+  * Command history
+  * Command completion
+  * Predictive typing
+* ksh, bash and zsh are POSIX shells
+
+----
+== Shell Scripting
+
+* A script is a file of shell commands that act as a program
+* sh and bash are almost always used
+* Years ago, sh (portable shell) was most common
+  * But variants and version features made portability hard
+* These days bash is almost everywhere
+  * Bash should be used for almost all shell scripting
+* A "script"  ==  a "program"
+  * Scripting == Programming
+  * Scripting Language == Programming Language
+
+* Therefore... Bash is a Programming Language (QED)
+
+----
+== Pieces of a Programming Language
+
+* Characters, Strings, Numbers
+* Data structures
+* Variables
+* Builtin functions, operators, transforms, etc
+* Expressions
+* Conditional logic
+* Loops and Iterators
+* User-defined Functions
+* Scope
+* Classes / Objects / Methods
+* Modules
+* Executable files
+* Error handling
+* Threads
+* Debugging facilities
+* Linters and Accessories
+* Packaged Module Sharing
+* Community
+
+----
+== History of Bash
+
+* Thompson Shell (1971)
+* Bourne Shell (1976)
+* csh (1978)
+* grep, sed, awk (1970s)
+  * Data processing in the shell
+* Perl (1987)
+  * Extremely shell influenced
+  * With all the grep, sed, awk features
+* Bash (1989)
+  * Took `=~` from Perl
+
+* Bash is under active development
+  * 5.1-rc2 released Nov 3, 2020 (Last week!!)
+  * 5.0 January 2019
+  * 4.4 September 2016
+  * 4,3 November 2014
+  * 4.2 February 2011
+
+----
+== What's good about Bash?
+
+* It's on almost every machine alive
+  * Or trivially obtainable
+* No language is better at IPC
+  * Programs that use other programs should be Bash
+* Syntax is often really nice
+* Can be written clean and modular
+* Simple and awesome debugging
+* Great for string/text processing
+* Has regular expressions
+* Lots of cool manipulations on variables
+* Often best choice for integration tests
+  * Works with Perl's `prove`
+
+----
+== What's bad about Bash?
+
+* Syntax is sometimes gross
+* Mediocre data structures
+* No floating point numbers
+* Not extremely fast
+* All variables are global
+* Functions are flimsy
+  * No return values
+  * No lexical scopes
+  * No closures
+
+----
+== When to use Bash?
+
+* I always ask up front, "Can I do this in Bash?"
+  * Often the easiest solution
+* Great for tests and automations
+* Not for production code
+  * Web stuff
+  * Database stuff
+
+----
+== Running code in various languages
+
+# bash:
+for i in {1..10}; do
+  echo "bash> $i"
+done
+
+$ for i in {1..10}; do echo "bash> $i"; done
+
+# perl:
+for my $i (1..10) {
+  say "perl> $i";
+}
+
+# python:
+for i in range(1, 10):
+  print("python> %d" % i)
+
+# ruby:
+(1..10).each do |i|
+  puts "ruby> #{i}"
+end
+
+# node:
+for (i = j = 1; j <= 10; i = ++j) {
+  console.log(`node> ${i}`);
+}
+
+# coffee:
+for i in [1..10]
+  console.log "coffee> #{i}"
+
+----
+== The git-hub command
+
+$ git hub user admorgan
+$ git hub repos admorgan
+$ git hub repos admorgan --raw
+$ git hub repos admorgan --raw | tail -n3
+$ git hub repos admorgan --raw | tail -n3 | git hub clone -
+$ git hub repos admorgan --raw | tail -n3 | ( while read r; do ( set -x; rm -fr "${r#*/}" ); done )
+$ git hub user
+$ git hub repos
+$ git hub repo git-hub
+$ git hub issues git-hub
+$ git hub issues git-hub -r | github issue -
+$ git hub repo
+$ git hub following | grep admorgan
+$ git hub follow admorgan
+
+----
+== git-hub Source Code
+
+$ vim git-hub
+$ vim git-hub/lib
+$ vim git-hub/ext
+
+----
+== Bash Syntax
+
+* Bash syntax is both similar and different than Perl, Python etc
+* Lines are split into words
+* Words are expanded and evaluated
+* Strings often don't need quotes
+* Statements are separated by \n ; &
+
+----
+== Bash Syntax Operators
+
+* > >> < |          - Redirections
+* >&2 2>&1 &>       - File handles 0=stdin 1=stdout 2=stderr
+* (...)             - Group and run as subprocess
+* ((...))           - Run math expression
+* `...`             - Run subprocess and return stdout (don't use in code)
+* $(...)            - Run subprocess and return stdout (use this; nestable)
+* $((...))          - Run math and return result
+* [ ... ]           - Conditional test (don't use this form)
+* [[ ... ]]         - Conditional test (always use this)
+* == != =~          - String comparison
+* -eq -ne -gt -ge   - Numeric comparison
+* -e -f -d -z -n    - Various test operators
+* && ||             - And Or
+* & ;               - Statement terminators
+
+----
+== Variable Assignment
+
+# perl:
+my $a = 'foo';
+my $b = "$a bar";
+my ($c, $d) = (42, 45);
+my $e = `echo ok`;
+say for $a, $b, $c, $d, $e;
+
+# bash:
+a=foo
+b="$a bar"
+c=42 d=45
+e=$(echo ok)
+printf "%s\n" $a "$b" $c $d $e
+
+----
+== if Statements
+
+# perl:
+if (-e ".") {
+  system "pwd";
+  system "ls";
+}
+
+# bash:
+if [[ -e . ]]; then
+  pwd
+  ls
+fi
+
+----
+== if Syntax
+
+if <condition-statements>
+then <statements>
+elif <condition-statements>
+then <statements>
+else <statements>
+fi
+
+----
+== if Syntax
+
+# bash:
+if
+  a=1
+  b=2
+  (( a < b ))
+then
+  echo $a
+  echo $b
+else
+  echo nope
+fi
+
+# bash:
+if [[ 1 -lt 2 ]]; then
+  echo ok
+else
+  echo nope
+fi
+
+$ if [[ ingy > 'dot net' ]]; then echo ok; else echo nope; fi
+
+----
+== Conditional expressions
+
+$ false || echo ok
+
+$ if true; then echo ok; fi
+
+$ ((1 < 3)) && echo ok
+
+$ [[ -e file.txt ]] && echo ok
+
+$ [[ foobar == *foo* ]] && echo ok
+
+$ [[ foobar =~ foo.+ ]] && echo ok
+
+----
+== for Loops
+
+# perl:
+my @array = qw<foo bar baz>;
+for (my $i = 0; $i < @array; $i++) {
+  my $name = $array[$i];
+  say "Hello ${\ ucfirst $name}";
+}
+
+# bash:
+array=(foo bar baz)
+i=0
+while [[ $i -lt ${#array[*]} ]]; do
+  name=${array[$((i++))]}
+  echo "Hello ${name^}"
+done
+
+# perl:
+my @array = qw<foo bar baz>;
+for my $name (@array) {
+  say "Hello ${\ ucfirst $name}";
+}
+
+# bash:
+array=(foo bar baz)
+for name in ${array[@]}; do
+  echo "Hello ${name^}"
+done
+
+----
+== Ranges
+
+# perl:
+for my $c ('a'..'z') {
+  say $c;
+}
+
+# bash:
+for c in {a..z}; do
+  echo $c
+done
+
+# bash:
+printf "%s\n" {a..z}
+
+----
+== while Loops
+
+# perl:
+open my $fh, 'file2.txt';
+while (my $line = <$fh>) {
+  print ">> $line";
+}
+
+# bash:
+while read line; do
+  echo ">> $line"
+done < file2.txt
+
+
+----
+== Getting Help
+
+* man bash
+
+$ man bash
+
+* Use the 'help' command for builtins
+
+$ type cd
+
+$ man cd
+
+$ help cd | head -n20
+
+* StackOverflow
+* Bash wiki
+
+----
+== Kinds of Commands
+
+* Shell has a clean abstraction for commands
+* Every command has stdin/stdout/stderr attached
+* Pipelines (`|`) connect commands together
+
+* Commands can be any of:
+  * Programs in $PATH
+  * Bash builtins
+  * User defined functions
+  * Aliases (only in interactive shell)
+  * Subshells
+
+----
+== Kinds of Commands
+
+* The `type` builtin gives this info
+
+$ type echo
+$ type ls
+$ foo()(:); type foo
+$ alias LS=ls; shopt -s expand_aliases; type LS
+
+* Bash has added many common bin commands as builtins
+
+$ type [
+$ type test
+$ ls -l /usr/bin/[
+$ ls -l /usr/bin/test
+
+* Commands can have weird names:
+  * foo-bar
+  * foo::bar
+  * foo.bar,baz
+
+# bash:
+foo.:bar,baz() { echo ok $1; }
+foo.:bar,baz yo
+
+----
+== Functions
+
+* Functions in shell are named groups of commands
+* They have $@ special stack array
+  * Like Perl's @_
+  * Also $* $# $1 $2 etc
+* `local` is the form of scoping (works like Perl's local)
+* You can return 0-255 from a function
+* No way to "return" a string
+  * You can set a variable to a string
+  * You can print a string to stdout
+* Functions are called as commands
+  * std{in,out,err}
+
+----
+== Subshells
+
+* One of the most powerful parts of Bash is subshells
+* Anything in parentheses forms a subshell
+* Variables and cwd changes are local to subshell
+
+# bash:
+foo=bar
+(
+  foo=123
+  exit 1
+  echo huh
+)
+echo $?
+echo $foo
+pwd
+(
+  cd /tmp
+  pwd
+)
+pwd
+
+----
+== Subshells and IFS
+
+# A lot of stackoverflow examples look like:
+
+# bash:
+list=({a..z})
+OLD_IFS=$IFS
+IFS=+
+echo "${list[*]}"
+IFS=$OLD_IFS
+unset OLD_IFS
+
+# bash:
+list=({a..z})
+(IFS=+; echo "${list[*]}")
+
+$ (IFS=:; printf "%s\n" $PATH)
+
+----
+== Pipelines
+
+* A | connect the LHS stdout to the RHS stdin
+
+$ cat /usr/share/dict/words | head -n20 | (while read word; do echo ${word^^}; done) | tac
+
+* Each command is put into a subshell
+
+# bash:
+word() { read word; Word=${word^}; }
+echo hello | word
+echo ">> $word $Word"
+
+# bash:
+shopt -s lastpipe
+word() { read word; Word=${word^}; }
+echo hello | word
+echo ">> $word $Word"
+
+----
+== Settings with set and shopt
+
+* Bash has dozens of settings that effect how it works
+* Different in script than interactive shell
+
+$ set -o
+
+$ shopt
+
+* set -e -u -o pipefail  # like `use strict;` in Perl
+
+$ set -e; echo 111; false; echo 222
+
+$ set -u; foo() ( echo $1 ); foo
+
+$ set -u; foo() ( echo ${1-} ); foo
+
+$ set -u; foo() ( echo ${1:-HELLO!!} ); foo
+
+$ foooo=1; set | less
+
+$ foooo=1; env | less
+
+$ export foooo=1; env | less
+
+----
+== Variable Scoping
+
+# bash:
+fun() {
+  local one=$1
+  echo "I got $# arguments."
+  echo "They are $(IFS=,; echo "$*")."
+}
+fun foo 123 "x y"
+
+# bash:
+fun() (
+  one=$1
+  echo "I got $# arguments."
+  echo "They are $(IFS=,; echo "$*")."
+)
+fun foo 123 "x y"
+
+----
+== Strings
+
+* Bash primarily deals with text and strings
+* Every word without syntax meta characters are strings
+* Quoted or unquoted
+* foo == 'foo' == "foo"
+* Quoted strings can be multi-line
+
+# bash:
+echo "Oh hello
+there!"
+
+----
+== Strings -- interpolation
+
+* Double quoted strings support interpolation
+* But not \ escape expansion by default
+  * That's up to the command to do
+
+# bash:
+echo "foo\nbar\n"
+echo
+printf "foo\nbar\n"
+echo
+echo -e "foo\nbar\n"
+
+----
+== Strings -- heredocs
+
+# bash
+name=John
+cat <<...
+Dear $name,
+_
+Welcome to the USA...
+...
+
+----
+== Strings -- expansions
+
+* Bash has a LOT of string variable expansions
+* They are really useful
+
+# bash:
+path=/foo/bar/baz
+echo ">>${path#/}<<"
+echo ">>${path#/*/}<<"
+echo ">>${path##/*}<<"
+echo ">>${path%/*}<<"
+echo ${#path}
+echo ${path//\//=}
+
+# bash:
+echo foo.{json,yaml,xml,htm{,l}}
+echo mv /some/long/path/file.{text,txt}
+
+----
+== Numbers and Math
+
+* Numeric operations happen inside ((...))
+* $ is optional on vars
+* Integer math only
+
+# bash:
+x=5
+echo $(( x++ ))
+(( x = x * 2 ))
+echo $x
+echo $((5/2))
+
+----
+== Bash Debugging -- set -x
+
+$ set -x; for i in {1..5}; do echo $i; done
+
+$ vim run
+
+$ echo ok
+
+----
+== Bash Debugging -- shellcheck
+
+$ shellcheck run
+
+$ shellcheck -e 2002 run
+
+----
+== Bash Debugging -- interactive
+
+# bash
+foo=bar
+export bar=42
+bash
+echo $foo
+
+# bash
+debugger() { while read -rp '>>> ' line; do eval "$line"; done; echo; }
+foo=bar
+debugger
+echo $foo
+
+----
+== Arrays
+
+* Using arrays well is critical to good Bash
+* They are not natively nestable
+* Bash also has (single level) hashes
+  * I won't cover them today
+* Some array primitives are good
+  * Many are missing but can be easily emulated
+
+----
+== Arrays - assignment
+
+# perl:
+my @array = ('Hello', 'there', 'world');
+say "@array!";
+
+# bash:
+array=(Hello there world)
+echo "${array[*]}!"
+
+# bash:
+array=(one 2 "la la")
+printf "%s\n" ${array[@]}
+echo
+printf "%s\n" "${array[@]}"
+echo
+printf "%s\n" "${array[*]}"
+
+----
+== Arrays - length
+
+# perl:
+my @array = ('Hello', 'there', 'world');
+my $length = @array;
+say $length;
+
+# bash:
+array=(Hello there world)
+length=${#array[*]}
+echo $length
+
+----
+== Arrays - push
+
+# perl:
+my @array = ('Hello', 'there');
+push @array, 'world';
+say "@array!";
+
+# bash:
+array=(Hello there)
+array+=(world)
+echo "${array[*]}!"
+
+----
+== Arrays -- shift
+
+# perl:
+my @array = (1..10);
+shift @array;
+say "@array";
+
+# bash:
+Array::shift() {
+  n=$1
+  name="$1[@]"
+  set -- "${!name}"
+  shift
+  IFS=' ' read -r -a $n <<<"$@"
+}
+array=({1..10})
+Array::shift array
+echo "${array[*]}"
+
+----
+== Read file into a string
+
+# perl:
+open my $fh, 'file1.txt';
+my $string = do { local $/; <$fh> };
+print $string;
+
+# bash:
+string=$(cat file1.txt)
+echo "$string"
+
+# bash:
+string=$(< file1.txt)
+echo "$string"
+
+----
+== Executables (Scripts) vs Modules
+
+* Perl
+  * Scripts are files with no extension and are executable
+  * Or they end with .pl
+  * Modules are files with .pm extension
+  * They are looked up by the values in @INC
+  * They loaded with `use` or `require`
+
+* Bash
+  * Scripts are files with no extension and are executable
+  * Or they end with .sh
+  * Modules are files with .bash extension
+  * They are looked up by the values in $PATH
+  * They loaded with `source` or `.`
+
+----
+== Bash Projects
+
+$ (cd git-hub; git subrepo status)
+
+$ (cd git-subrepo; bash -i)
+$ (cd git-hub; bash -i)
+$ (cd bashplus; bash -i)
+$ (cd getopt-bash; bash -i)
+$ (cd json-bash; bash -i)
+$ (cd test-more-bash; bash -i)
+
+----
+== Other Cool Projects
+
+$ make -C testml test
+$ (cd testml; bash -i)
+  * Lingy
+
+$ (cd pegex-pm; bash -i)
+
+$ make -C yaml-reference-parser test
+$ (cd yaml-reference-parser; bash -i)
+
+$ yaml-editor -i
+$ yaml-editor -g 1 4 15 20 28
+
+----
+== Inline
+
+# perl:
+use Inline 'C';
+greet('Ingy');
+greet(42);
+__END__
+__C__
+void greet(char* name) {
+  printf("Hello %s!\n", name);
+}
+
+----
+== The End
+
+$ git hub repo

@@ -1,0 +1,117 @@
+#!/usr/bin/env bash
+
+set -e -u -o pipefail
+
+clear
+
+file=$1 line=$2 flags=${3-}
+
+all=false errexit=false xtrace=false
+bash=false coffee=false js=false node=false perl=false python=false ruby=false
+
+for flag in ${flags//,/ }; do
+  var=${flag#--}
+  printf -v "$var" true
+done
+
+code=$(
+  cat $file |
+  perl -e '
+    $n = shift(@ARGV);
+    $i = 0;
+    $code = "";
+    $found = 0;
+    while ($l = <>) {
+      $i++;
+      $code .= $l;
+      $found = 1 if $i >= $n;
+      if ($i == $n and $l =~ /^\ {4}\$\ /) {
+        $code = $l;
+        last;
+      }
+      if ($l !~ /\S/) {
+        if ($found) {
+          $code =~ s/\n+\z/\n/;
+          print $code;
+          exit 0;
+        }
+        $code = "";
+      }
+    }
+    print $code;
+  ' "$line" |
+  perl -pe 's/^\ {4}//gm' |
+  perl -p0e 's/\A\s*(.*?)\s*\z/$1/'
+)
+
+[[ $code ]] || exit 0
+
+if [[ $code == \$* ]]; then
+  code=$(perl -pe 's/^[\$\>]\ //m' <<< "$code")
+  bash=true
+
+elif [[ $code =~ ^\#\ (bash|coffee|js|node|perl|python|ruby) ]]; then
+  var=${BASH_REMATCH[1]}
+  printf -v "$var" true
+  code=$(tail -n+2 <<<"$code")
+
+else
+  all=true
+  code=$(
+    cat "$file" |
+    perl -pe 's/^\ {4}//gm' |
+    perl -p0e 's/\A\s*(.*?)\s*\z/$1/'
+  )
+  bash=true
+fi
+
+line=$(printf "%.0s-" {1..80})
+
+if ! $all; then
+  cat <<...
+$line
+$code
+...
+fi
+
+echo "$line"
+
+if $bash; then
+  script=code.bash
+  if $errexit; then
+    if $xtrace; then
+      cmd=(bash -e "$script")
+    else
+      cmd=(bash -ex "$script")
+    fi
+  else
+    cmd=(bash "$script")
+  fi
+elif $perl; then
+  script=code.pl
+  cmd=(perl -Mv5.12 "$script")
+elif $python; then
+  script=code.py
+  cmd=(python "$script")
+elif $ruby; then
+  script=code.rb
+  cmd=(ruby "$script")
+elif $js || $node; then
+  script=code.js
+  cmd=(node "$script")
+elif $coffee; then
+  script=code.coffee
+  cmd=(coffee "$script")
+fi
+
+echo "$code" > "$script"
+
+"${cmd[@]}"
+
+rc=$?
+
+echo "$line"
+
+if [[ $rc -ne 0 ]]; then
+  echo "exit status -> $rc"
+fi

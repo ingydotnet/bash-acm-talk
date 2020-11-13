@@ -1,0 +1,16 @@
+#!/bash
+
+nvmup
+
+make repos
+
+make clean
+
+source complete-shell/.rc
+source git-hub/.rc
+source git-subrepo/.rc
+source makeplus/.rc
+source testml/.rc
+source yaml-editor/.rc
+
+make run
